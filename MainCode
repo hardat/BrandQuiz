@@ -1,0 +1,570 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Trophy, Star, Target, Award, RotateCcw, Play, Clock, Share2, Twitter, Facebook, Linkedin } from 'lucide-react';
+
+const BrandTaglineQuiz = () => {
+  // Game data with Indian brands organized by difficulty
+  const gameData = {
+    easy: [
+      { brand: "Amul", tagline: "The Taste of India", options: ["Amul", "Mother Dairy", "Britannia", "Nestle"] },
+      { brand: "Tata Salt", tagline: "Desh Ka Namak", options: ["Tata Salt", "Annapurna Salt", "Captain Cook", "Surya Salt"] },
+      { brand: "Maggi", tagline: "2 Minute Mein Ban Jaye", options: ["Maggi", "Top Ramen", "Yippee", "Sunfeast"] },
+      { brand: "Airtel", tagline: "Har Ek Friend Zaroori Hota Hai", options: ["Airtel", "Vodafone", "Jio", "BSNL"] },
+      { brand: "Asian Paints", tagline: "Har Ghar Kuch Kehta Hai", options: ["Asian Paints", "Berger Paints", "Dulux", "Nerolac"] },
+      { brand: "Fevicol", tagline: "Mazboot Jod Hai", options: ["Fevicol", "M-Seal", "Araldite", "Elephant"] },
+      { brand: "Cadbury Dairy Milk", tagline: "Kuch Meetha Ho Jaye", options: ["Cadbury", "Nestle", "Ferrero", "Hershey's"] },
+      { brand: "Surf Excel", tagline: "Daag Acche Hain", options: ["Surf Excel", "Ariel", "Tide", "Rin"] },
+      { brand: "LIC", tagline: "Zindagi Ke Saath Bhi, Zindagi Ke Baad Bhi", options: ["LIC", "ICICI Prudential", "HDFC Life", "SBI Life"] },
+      { brand: "Pepsi", tagline: "Yeh Dil Maange More", options: ["Pepsi", "Coca-Cola", "Thums Up", "Sprite"] },
+      { brand: "Parle-G", tagline: "G Maane Genius", options: ["Parle-G", "Britannia", "Sunfeast", "Unibic"] },
+      { brand: "Bisleri", tagline: "Pure & Safe", options: ["Bisleri", "Aquafina", "Kinley", "Bailey"] },
+      { brand: "McDonald's", tagline: "I'm Lovin' It", options: ["McDonald's", "Burger King", "KFC", "Subway"] },
+      { brand: "Nike", tagline: "Just Do It", options: ["Nike", "Adidas", "Puma", "Reebok"] },
+      { brand: "Coca-Cola", tagline: "Taste the Feeling", options: ["Coca-Cola", "Pepsi", "Sprite", "Fanta"] }
+    ],
+    medium: [
+      { brand: "Raymond", tagline: "The Complete Man", options: ["Raymond", "Peter England", "Van Heusen", "Arrow"] },
+      { brand: "Titan", tagline: "Be More", options: ["Titan", "Fastrack", "Casio", "Timex"] },
+      { brand: "Bajaj", tagline: "Hamara Bajaj", options: ["Bajaj", "Hero", "Honda", "Yamaha"] },
+      { brand: "HDFC Bank", tagline: "We Understand Your World", options: ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank"] },
+      { brand: "Maruti Suzuki", tagline: "Way of Life", options: ["Maruti Suzuki", "Hyundai", "Tata Motors", "Mahindra"] },
+      { brand: "Colgate", tagline: "Kya Aapke Toothpaste Mein Namak Hai?", options: ["Colgate", "Pepsodent", "Close-Up", "Oral-B"] },
+      { brand: "Hero MotoCorp", tagline: "Pleasure of Riding", options: ["Hero MotoCorp", "Honda", "Bajaj", "TVS"] },
+      { brand: "Fair & Lovely", tagline: "Glow & Lovely", options: ["Fair & Lovely", "Pond's", "Olay", "Lakme"] },
+      { brand: "Britannia", tagline: "Eat Healthy, Think Better", options: ["Britannia", "Parle", "ITC", "Mondelez"] },
+      { brand: "ICICI Bank", tagline: "Hum Hai Na", options: ["ICICI Bank", "HDFC Bank", "SBI", "Axis Bank"] },
+      { brand: "Vodafone", tagline: "The future to enable", options: ["Vodafone", "Airtel", "Jio", "Idea"] },
+      { brand: "Samsung", tagline: "Do What You Can't", options: ["Samsung", "LG", "Sony", "Panasonic"] },
+      { brand: "Honda", tagline: "The Power of Dreams", options: ["Honda", "Toyota", "Maruti", "Hyundai"] },
+      { brand: "Hyundai", tagline: "New Thinking. New Possibilities", options: ["Hyundai", "Honda", "Toyota", "Nissan"] },
+      { brand: "Flipkart", tagline: "Ab Har Wish Hogi Poori", options: ["Flipkart", "Amazon", "Snapdeal", "Myntra"] }
+    ],
+    hard: [
+      { brand: "Havells", tagline: "Complete Home Solutions", options: ["Havells", "Crompton", "Usha", "Orient"] },
+      { brand: "ITC", tagline: "Life. Well Made", options: ["ITC", "Hindustan Unilever", "P&G", "Godrej"] },
+      { brand: "Canon", tagline: "Delighting You Always", options: ["Canon", "Nikon", "Sony", "Olympus"] },
+      { brand: "State Bank of India", tagline: "The Banker to Every Indian", options: ["SBI", "HDFC", "ICICI", "PNB"] },
+      { brand: "Jio", tagline: "Digital India", options: ["Jio", "Airtel", "Vodafone", "BSNL"] },
+      { brand: "Paytm", tagline: "Karo Zyada", options: ["Paytm", "PhonePe", "Google Pay", "Amazon Pay"] },
+      { brand: "Swiggy", tagline: "What's on your mind?", options: ["Swiggy", "Zomato", "Uber Eats", "FoodPanda"] },
+      { brand: "MakeMyTrip", tagline: "Let's Go!", options: ["MakeMyTrip", "Cleartrip", "Yatra", "Goibibo"] },
+      { brand: "OYO", tagline: "India's Largest Hotel Chain", options: ["OYO", "Treebo", "FabHotels", "RedDoorz"] },
+      { brand: "Zomato", tagline: "Order karo, khushi se khao", options: ["Zomato", "Swiggy", "Uber Eats", "Domino's"] },
+      { brand: "BookMyShow", tagline: "It All Starts Here", options: ["BookMyShow", "Paytm Insider", "TicketNew", "PVR"] },
+      { brand: "Ola", tagline: "Move with Ola", options: ["Ola", "Uber", "Rapido", "Meru"] },
+      { brand: "PhonePe", tagline: "Digital Payment for Bharat", options: ["PhonePe", "Paytm", "Google Pay", "BHIM"] },
+      { brand: "Amazon", tagline: "Aaj Kya Mangwana Hai?", options: ["Amazon", "Flipkart", "Myntra", "Snapdeal"] },
+      { brand: "Uber", tagline: "Move the way you want", options: ["Uber", "Ola", "Lyft", "Grab"] }
+    ]
+  };
+
+  // Scoring system based on difficulty and time
+  const getQuestionScore = (difficulty, timeLeft) => {
+    const baseScores = { easy: 10, medium: 15, hard: 20 };
+    const timeBonus = Math.floor(timeLeft / 6); // Up to 10 bonus points for speed
+    return baseScores[difficulty] + timeBonus;
+  };
+
+  // Performance levels for adaptive difficulty
+  const getPerformanceLevel = (correctCount, totalQuestions) => {
+    if (totalQuestions === 0) return 'medium';
+    const accuracy = correctCount / totalQuestions;
+    if (accuracy >= 0.8) return 'hard';
+    if (accuracy >= 0.6) return 'medium';
+    return 'easy';
+  };
+
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionNumber, setQuestionNumber] = useState(1);
+  const [score, setScore] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [usedQuestions, setUsedQuestions] = useState(new Set());
+  const [currentDifficulty, setCurrentDifficulty] = useState('medium');
+  const [difficultyHistory, setDifficultyHistory] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [questionStartTime, setQuestionStartTime] = useState(null);
+  const timerRef = useRef(null);
+
+  // Shuffle array function
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Timer effect
+  useEffect(() => {
+    if (gameStarted && timeLeft > 0 && !gameOver) {
+      timerRef.current = setTimeout(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 || questionNumber > 10) {
+      endGame();
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [gameStarted, timeLeft, gameOver, questionNumber]);
+
+  const getRandomQuestion = (difficulty) => {
+    const questionPool = gameData[difficulty];
+    const availableQuestions = questionPool.filter((question, index) => 
+      !usedQuestions.has(`${difficulty}-${question.brand}`)
+    );
+    
+    if (availableQuestions.length === 0) {
+      // Try other difficulties if current difficulty is exhausted
+      const allDifficulties = ['easy', 'medium', 'hard'].filter(d => d !== difficulty);
+      for (const altDifficulty of allDifficulties) {
+        const altPool = gameData[altDifficulty];
+        const altAvailable = altPool.filter((question) => 
+          !usedQuestions.has(`${altDifficulty}-${question.brand}`)
+        );
+        if (altAvailable.length > 0) {
+          const randomIndex = Math.floor(Math.random() * altAvailable.length);
+          const selectedQuestion = altAvailable[randomIndex];
+          
+          const shuffledQuestion = {
+            ...selectedQuestion,
+            difficulty: altDifficulty,
+            options: shuffleArray(selectedQuestion.options)
+          };
+          
+          setUsedQuestions(prev => new Set([...prev, `${altDifficulty}-${selectedQuestion.brand}`]));
+          return shuffledQuestion;
+        }
+      }
+      return null; // All questions exhausted
+    }
+    
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const selectedQuestion = availableQuestions[randomIndex];
+    
+    const shuffledQuestion = {
+      ...selectedQuestion,
+      difficulty: difficulty,
+      options: shuffleArray(selectedQuestion.options)
+    };
+    
+    setUsedQuestions(prev => new Set([...prev, `${difficulty}-${selectedQuestion.brand}`]));
+    return shuffledQuestion;
+  };
+
+  const startGame = () => {
+    setGameStarted(true);
+    setGameOver(false);
+    setShowResults(false);
+    setTimeLeft(60);
+    setScore(0);
+    setCorrectAnswers(0);
+    setQuestionNumber(1);
+    setCurrentDifficulty('medium');
+    setDifficultyHistory([]);
+    setUsedQuestions(new Set());
+    setFeedback('');
+    setShowFeedback(false);
+    setQuestionStartTime(Date.now());
+    
+    const firstQuestion = getRandomQuestion('medium');
+    setCurrentQuestion(firstQuestion);
+  };
+
+  const handleAnswer = (answer) => {
+    if (showFeedback) return;
+    
+    setSelectedAnswer(answer);
+    setShowFeedback(true);
+    
+    const isCorrect = answer === currentQuestion.brand;
+    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+    const questionTimeLeft = Math.max(0, 60 - timeSpent);
+    
+    if (isCorrect) {
+      const questionScore = getQuestionScore(currentQuestion.difficulty, questionTimeLeft);
+      setScore(prev => prev + questionScore);
+      setCorrectAnswers(prev => prev + 1);
+      setFeedback(`🎉 Correct! +${questionScore} points`);
+    } else {
+      setFeedback(`❌ Wrong! The correct answer is ${currentQuestion.brand}`);
+    }
+    
+    // Update difficulty history
+    setDifficultyHistory(prev => [...prev, {
+      question: questionNumber,
+      difficulty: currentQuestion.difficulty,
+      correct: isCorrect,
+      timeSpent: timeSpent
+    }]);
+    
+    // Move to next question after delay
+    setTimeout(() => {
+      nextQuestion(isCorrect);
+    }, 2000);
+  };
+
+  const nextQuestion = (wasCorrect) => {
+    if (questionNumber >= 10) {
+      endGame();
+      return;
+    }
+    
+    // Adaptive difficulty adjustment
+    const newDifficulty = getPerformanceLevel(correctAnswers + (wasCorrect ? 1 : 0), questionNumber);
+    setCurrentDifficulty(newDifficulty);
+    
+    setShowFeedback(false);
+    setSelectedAnswer('');
+    setQuestionNumber(prev => prev + 1);
+    setQuestionStartTime(Date.now());
+    
+    const nextQ = getRandomQuestion(newDifficulty);
+    if (nextQ) {
+      setCurrentQuestion(nextQ);
+    } else {
+      endGame();
+    }
+  };
+
+  const endGame = () => {
+    setGameOver(true);
+    setGameStarted(false);
+    setShowResults(true);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  };
+
+  const resetGame = () => {
+    setGameStarted(false);
+    setGameOver(false);
+    setShowResults(false);
+    setCurrentQuestion(null);
+    setScore(0);
+    setCorrectAnswers(0);
+    setQuestionNumber(1);
+    setTimeLeft(60);
+    setUsedQuestions(new Set());
+    setFeedback('');
+    setShowFeedback(false);
+    setCurrentDifficulty('medium');
+    setDifficultyHistory([]);
+  };
+
+  const getPerformanceRating = () => {
+    const accuracy = correctAnswers / 10;
+    if (accuracy >= 0.9) return { rating: "Exceptional", color: "text-purple-600", emoji: "🏆" };
+    if (accuracy >= 0.8) return { rating: "Excellent", color: "text-green-600", emoji: "🌟" };
+    if (accuracy >= 0.7) return { rating: "Very Good", color: "text-blue-600", emoji: "👍" };
+    if (accuracy >= 0.6) return { rating: "Good", color: "text-yellow-600", emoji: "👌" };
+    if (accuracy >= 0.5) return { rating: "Average", color: "text-orange-600", emoji: "📈" };
+    return { rating: "Needs Improvement", color: "text-red-600", emoji: "💪" };
+  };
+
+  const shareResults = (platform) => {
+    const performance = getPerformanceRating();
+    const text = `I just scored ${score} points in the Indian Brand Tagline Challenge! 🎯 Got ${correctAnswers}/10 questions right with a ${performance.rating} rating! ${performance.emoji} Can you beat my score?`;
+    const url = window.location.href;
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`;
+        break;
+      default:
+        // Native share if available, fallback to copy
+        if (navigator.share) {
+          navigator.share({
+            title: 'Indian Brand Tagline Challenge Results',
+            text: text,
+            url: url,
+          });
+          return;
+        } else {
+          navigator.clipboard.writeText(`${text} ${url}`);
+          alert('Results copied to clipboard!');
+          return;
+        }
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'easy': return 'text-green-600 bg-green-100';
+      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'hard': return 'text-red-600 bg-red-100';
+      default: return 'text-blue-600 bg-blue-100';
+    }
+  };
+
+  if (showResults) {
+    const performance = getPerformanceRating();
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-6 text-white text-center">
+              <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-300" />
+              <h1 className="text-3xl font-bold mb-2">Quiz Complete!</h1>
+              <div className="text-xl">{performance.emoji} {performance.rating}</div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{score}</div>
+                  <div className="text-sm text-gray-600">Total Score</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{correctAnswers}/10</div>
+                  <div className="text-sm text-gray-600">Correct Answers</div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3 text-gray-800">Question Difficulty Progression:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {difficultyHistory.map((item, index) => (
+                    <span
+                      key={index}
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(item.difficulty)} ${
+                        item.correct ? 'ring-2 ring-green-400' : 'ring-2 ring-red-400'
+                      }`}
+                    >
+                      Q{item.question}: {item.difficulty.charAt(0).toUpperCase() + item.difficulty.slice(1)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3 text-gray-800">Share Your Results:</h3>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={() => shareResults('twitter')}
+                    className="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-lg transition-colors"
+                  >
+                    <Twitter className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => shareResults('facebook')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-colors"
+                  >
+                    <Facebook className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => shareResults('linkedin')}
+                    className="bg-blue-800 hover:bg-blue-900 text-white p-3 rounded-lg transition-colors"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => shareResults('native')}
+                    className="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-lg transition-colors"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={resetGame}
+                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!gameStarted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+              <Trophy className="text-yellow-400" />
+              Adaptive Brand Challenge
+            </h1>
+            <p className="text-xl text-blue-100 mb-2">
+              60-second adaptive quiz with 10 questions
+            </p>
+            <p className="text-sm text-blue-200">
+              Difficulty adjusts based on your performance - just like GMAT!
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-8 shadow-xl">
+            <div className="text-center mb-6">
+              <Clock className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">How It Works</h2>
+              
+              <div className="space-y-3 text-left mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                  <span className="text-gray-700">Answer 10 questions in 60 seconds</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                  <span className="text-gray-700">Difficulty adapts to your performance</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                  <span className="text-gray-700">Earn bonus points for speed</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                  <span className="text-gray-700">Share your results on social media</span>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 className="font-semibold mb-2">Scoring System:</h3>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div>🟢 Easy: 10 + speed bonus points</div>
+                  <div>🟡 Medium: 15 + speed bonus points</div>
+                  <div>🔴 Hard: 20 + speed bonus points</div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={startGame}
+              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold text-lg py-4 rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3"
+            >
+              <Play className="w-6 h-6" />
+              Start 60-Second Challenge
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 p-4 flex items-center justify-center">
+        <div className="text-white text-xl">Loading next question...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 p-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header Stats */}
+        <div className="flex justify-between items-center mb-6 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+          <div className="flex items-center gap-4 text-white">
+            <div className="flex items-center gap-1">
+              <Clock className="w-5 h-5 text-red-300" />
+              <span className="font-bold text-lg">{timeLeft}s</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="w-5 h-5 text-yellow-400" />
+              <span className="font-semibold">{score}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Target className="w-5 h-5 text-green-400" />
+              <span className="font-semibold">{correctAnswers}/10</span>
+            </div>
+          </div>
+          <div className="text-white text-sm">
+            <span className={`px-2 py-1 rounded-full text-xs ${getDifficultyColor(currentDifficulty)}`}>
+              {currentDifficulty.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-6">
+          <div className="flex justify-between text-white text-sm mb-2">
+            <span>Question {questionNumber} of 10</span>
+            <span>{Math.round((questionNumber - 1) / 10 * 100)}% Complete</span>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-2">
+            <div 
+              className="bg-white h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((questionNumber - 1) / 10) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Question Card */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-6 text-white">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-semibold">Which brand uses this tagline?</h2>
+              <span className={`px-2 py-1 rounded text-xs ${getDifficultyColor(currentDifficulty)}`}>
+                {currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}
+              </span>
+            </div>
+            <div className="text-2xl font-bold italic">"{currentQuestion.tagline}"</div>
+          </div>
+
+          <div className="p-6">
+            {showFeedback ? (
+              <div className="text-center">
+                <div className="text-lg font-semibold mb-4 text-gray-700">
+                  {feedback}
+                </div>
+                {selectedAnswer !== currentQuestion.brand && (
+                  <div className="text-sm text-gray-600">
+                    You selected: {selectedAnswer}
+                  </div>
+                )}
+                <div className="text-sm text-gray-500 mt-2">
+                  Next question loading...
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {currentQuestion.options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswer(option)}
+                    className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all font-medium text-gray-700"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Time Warning */}
+        {timeLeft <= 10 && (
+          <div className="mt-4 text-center text-red-200 text-sm animate-pulse">
+            ⚠️ Time running out! {timeLeft} seconds left
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default BrandTaglineQuiz;
